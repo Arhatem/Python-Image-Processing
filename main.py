@@ -38,7 +38,7 @@ class gui:
         
     
     def saveAsTextFile(self):
-        
+        # textFile = open('file.txt',"w+")
         text = self.textarea.get("1.0","end")
         files = [('All Files', '*.*'),  
              ('Python Files', '*.py'), 
