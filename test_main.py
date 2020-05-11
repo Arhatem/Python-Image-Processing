@@ -68,9 +68,9 @@ class gui:
         self.textarea.delete("1.0", "end")
         file.close()
     
-    
+root= tk.Tk()
 
 t=gui()
 
-
+root.mainloop()
 

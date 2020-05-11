@@ -1,25 +1,46 @@
+import mkl
 import sys
-
 import cv2
 from PIL import Image 
 import numpy as np
+import cv2
 import pytesseract
+import PyQt5
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QHBoxLayout , QVBoxLayout,QApplication
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QLabel,
     QInputDialog, QApplication,QFileDialog,QPlainTextEdit)
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
-
 
 class moderator:
     def __init__(self):
         pass
 
-    def process_photo(self,photo):                   
-        text = pytesseract.image_to_string(photo)
-        return text
+    def process_photo(self,photo):
+        # Read image with opencv
+        img = cv2.imread(photo)
+        # Convert to gray
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)   
+        # Blur
+        # img = cv2.medianBlur(img, 1)
+        
+        #  Apply threshold to get image with only black and white
+        _,img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        # for i in range(4):
+        # Apply dilation and erosion to remove some noise   
+        kernel = np.ones((1, 1), np.uint8)    
+        # img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+        img =  cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+        img = cv2.dilate(img, kernel, iterations=1)    
+        img = cv2.erode(img, kernel, iterations=1)
+        img = cv2.dilate(img, kernel, iterations=5)  
+        img = cv2.medianBlur(img,3)
+        # cv2.imwrite('C:/Users/Hady/Desktop/img-processing-master/test.png', img)
+        # Recognize text with tesseract for python
+        result = pytesseract.image_to_string(img, lang='eng')                   
+        
+        return result
 
 
 class gui:
@@ -98,4 +119,7 @@ class gui:
 
 
     
-f = gui()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    w = gui()
+    app.exec()
