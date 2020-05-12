@@ -24,47 +24,33 @@ class moderator:
         # Convert to gray
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)   
         # Blur
-        # img = cv2.medianBlur(img, 1)
-        
-        #  Apply threshold to get image with only black and white
-        _,img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-        # for i in range(4):
-        # Apply dilation and erosion to remove some noise   
-        kernel = np.ones((1, 1), np.uint8)    
-        # img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+        img = cv2.medianBlur(img, 1)
+        # # Apply dilation and open and close to remove some noise   
+        kernel = np.ones((1,1), np.uint8)    
+        img = cv2.dilate(img, kernel, iterations=1)  
+        img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
         img =  cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
-        img = cv2.dilate(img, kernel, iterations=1)    
-        img = cv2.erode(img, kernel, iterations=1)
-        img = cv2.dilate(img, kernel, iterations=5)  
-        img = cv2.medianBlur(img,3)
-        # cv2.imwrite('C:/Users/Hady/Desktop/img-processing-master/test.png', img)
+        #  Apply threshold to get image with only black and white
+        _,img = cv2.threshold(img,100,240,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        cv2.imwrite('C:/Users/Hady/Desktop/img-processing-master/test.png', img)
         # Recognize text with tesseract for python
         result = pytesseract.image_to_string(img, lang='eng')                   
-        
         return result
+
     def process_photo_normal_written(self,photo):
         # Read image with opencv
         img = cv2.imread(photo)
         # Convert to gray
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)   
-        # Blur
-        # img = cv2.medianBlur(img, 1)
-        
-        #  Apply threshold to get image with only black and white
-        _,img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-        # for i in range(4):
-        # Apply dilation and erosion to remove some noise   
+        # Apply dilation to make it more thin    
         kernel = np.ones((1, 1), np.uint8)    
-        # img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-        img =  cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
         img = cv2.dilate(img, kernel, iterations=1)    
-        img = cv2.erode(img, kernel, iterations=1)
-        img = cv2.dilate(img, kernel, iterations=5)  
-        img = cv2.medianBlur(img,3)
-        # cv2.imwrite('C:/Users/Hady/Desktop/img-processing-master/test.png', img)
+        #  Apply threshold to get image with only black and white
+        _,img = cv2.threshold(img,0,240,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        # Apply morphology Close to avoid any missing pixels throgh the letters
+        img =  cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
         # Recognize text with tesseract for python
-        result = pytesseract.image_to_string(img, lang='eng')                   
-        
+        result = pytesseract.image_to_string(img, lang='eng')                  
         return result
 
 
@@ -76,17 +62,17 @@ class gui:
 
         self.window = QWidget()
 
-        self.window.setWindowTitle('photo to text')
+        self.window.setWindowTitle('Photo to text')
 
-        self.window.setGeometry(100, 100, 280, 80)
+        self.window.setGeometry(700, 700, 700, 700)
         
         self.window.move(60, 15)
 
-        self.hand_writen_btn = QPushButton('hand writen')
+        self.hand_writen_btn = QPushButton('Hand writen')
 
         self.hand_writen_btn.clicked.connect(self.handel_photo_hand)
 
-        self.normal_text_btn = QPushButton('normal text')
+        self.normal_text_btn = QPushButton('Normal text')
 
         self.normal_text_btn.clicked.connect(self.handel_photo_normal)        
 
