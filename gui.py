@@ -84,7 +84,7 @@ class gui:
 
         self.textArea = QPlainTextEdit()
 
-        self.lable=QLabel('please select the photo type')
+        self.lable=QLabel('Please select the photo type')
 
         self.layout.addWidget(self.lable)
 
